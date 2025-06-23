@@ -1,0 +1,26 @@
+FROM node:20-alpine
+
+ENV APP_DIR /app
+ENV TZ=Europe/Paris
+
+WORKDIR ${APP_DIR}/pokedex/front_end/pokedex_front_app
+
+# Copie du package.json pour installer les librairies front
+COPY ./pokedex/front_end/pokedex_front_app/package.json .
+
+## Exécution du npm install et installation du linter eslint
+RUN npm install
+##&& npm install -g eslint
+
+## Copie du projet React
+COPY ./pokedex/front_end/pokedex_front_app/ .
+
+## Lancement de l'application React
+#CMD ["npm", "start"]
+
+CMD ["npm", "run", "dev", "--", "--host"]
+
+# CMD ["tail", "-f", "/dev/null"]
+
+
+## !! Ne pas oublier de modifier la config de vitejs au début du projet pour pouvoir lancer React !!

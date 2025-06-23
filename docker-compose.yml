@@ -1,0 +1,77 @@
+services:
+  mariadb:
+    image: mariadb:11.3
+    container_name: mariadb_local
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: pokedex
+      MARIADB_USER: symfony
+      MARIADB_PASSWORD: symfony
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - pokedex_network
+
+  phpMyAdmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin_local
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mariadb
+      PMA_USER: symfony
+      PMA_PASSWORD: symfony
+    depends_on:
+      - mariadb
+    networks:
+      - pokedex_network
+
+  symfony_pokedex:
+    build:
+      context: .
+      dockerfile: docker/Dockerfiles/Symfony/Dockerfile_symfony
+    container_name: symfony_pokedex_local
+    volumes:
+      - ./pokedex/back_end:/var/www/html/pokedex/back_end
+    expose:
+      - "9000"
+    networks:
+      - pokedex_network
+
+  react_pokedex:
+    build:
+      context: .
+      dockerfile: docker/Dockerfiles/React/Dockerfile_react
+    container_name: react_pokedex_local
+    volumes:
+      - ./pokedex/front_end:/app/pokedex/front_end/
+      #- react_node_modules:/app/pokedex/front_end/pokedex_front_app/node_modules
+    ports:
+      - "3000:5173"
+    networks:
+      - pokedex_network
+
+  nginx_pokedex:
+    build:
+      context: .
+      dockerfile: docker/Dockerfiles/Nginx/Dockerfile_nginx
+    container_name: nginx_pokedex_local
+    volumes:
+      - ./pokedex/back_end:/var/www/html/pokedex/back_end
+      #- react_node_modules:/app/pokedex/front_end/pokedex_front_app/node_modules
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - symfony_pokedex
+      - react_pokedex
+    networks:
+      - pokedex_network
+volumes:
+  react_node_modules:
+  mariadb_data:
+networks:
+  pokedex_network:
+    driver: bridge
