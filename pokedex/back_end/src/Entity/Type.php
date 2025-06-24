@@ -13,11 +13,11 @@ class Type
   #[ORM\Id]
   #[ORM\GeneratedValue]
   #[ORM\Column(type: 'integer')]
-  #[Groups(['Type:read'])]
+  #[Groups(['pokemon:read', 'type:read'])]
   private ?int $id = null;
 
   #[ORM\Column(name: 'Libelle', type: 'string', length: 50)]
-  #[Groups(['type:read'])]
+  #[Groups(['pokemon:read', 'type:read'])]
   private string $libelle;
 
   public function getId(): ?int

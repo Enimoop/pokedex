@@ -8,6 +8,8 @@ export default function PcContainer() {
 
   // État pour stocker la taille de la fenêtre
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [pokemons, setPokemons] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Met à jour la largeur à chaque redimensionnement
   useEffect(() => {
@@ -15,6 +17,33 @@ export default function PcContainer() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Récupération des Pokémons depuis l’API
+useEffect(() => {
+  fetch('https://localhost/api/pokemons', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      
+    },
+    mode: 'cors',
+  
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error('Erreur réseau');
+      return res.json();
+    })
+    .then((pokemons) => {
+      setPokemons(pokemons);
+      console.log('Pokémons récupérés :', pokemons);
+      setLoading(false);
+    })
+    .catch((error) => {
+      console.error('Erreur lors du fetch :', error);
+      setLoading(false);
+    });
+}, []);
+
 
   // Détermine dynamiquement le nombre de colonnes selon la largeur de la fenêtre
   let cols;
@@ -28,7 +57,7 @@ export default function PcContainer() {
   let rows = 6;
   if (cols <= 4) rows = 4;
 
-  const pokemons = [
+  /* const pokemons = [
     {
       id: 1,
       name: 'Bulbasaur',
@@ -45,7 +74,7 @@ export default function PcContainer() {
     },
     // Ajoute d'autres pokemons si tu veux
   ];
-
+ */
   // Calcule le style de position avec l'échelle selon les colonnes actuelles
   const getPositionStyle = (pos) => {
     const x = (pos % cols) * (cellSize + gap);
@@ -86,7 +115,7 @@ export default function PcContainer() {
           <Pokemons
             key={p.id}
             pokemon={p}
-            style={getPositionStyle(p.position)}
+            style={getPositionStyle(p.id-1)}
             onClick={handleClick}
           />
         ))}
