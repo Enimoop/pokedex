@@ -66,3 +66,62 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+@font-face {
+  font-family: 'PokemonFont';
+  src: url('./assets/fonts/pokemonsolid.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: linear-gradient(135deg, #f5f0e6 0%, #a0cbb3 100%);
+   overflow-x: hidden; /* pour éviter scroll horizontal */
+}
+
+body {
+  place-items: start; /* au lieu de center, ça aligne en haut */
+}
+
+.pc-grid {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: repeat(8, 1fr);
+  max-width: 960px; /* 8 x 120px + 7 x 10px gap (approx) */
+  margin: 0 auto; /* centre horizontalement */
+}
+
+
+.pc-cell {
+  width: 120px;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  backdrop-filter: blur(4px);
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.pc-cell.empty {
+  /* Case vide : ratio 1.4 via padding-top */
+  padding-top: 140%;
+}
+
+.pc-cell.has-pokemon {
+  /* Case avec Pokémon : hauteur fixe */
+  height: 168px;
+  padding-top: 0;
+}
+
+.pokemon-image {
+  max-width: 60%;
+  max-height: 60%;
+  object-fit: contain;
+  pointer-events: none;
+}

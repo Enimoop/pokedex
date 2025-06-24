@@ -47,9 +47,9 @@ services:
     container_name: react_pokedex_local
     volumes:
       - ./pokedex/front_end:/app/pokedex/front_end/
-      #- react_node_modules:/app/pokedex/front_end/pokedex_front_app/node_modules
+      - react_node_modules:/app/pokedex/front_end/pokedex_front_app/node_modules
     ports:
-      - "3000:5173"
+      - "5173:5173"
     networks:
       - pokedex_network
 
