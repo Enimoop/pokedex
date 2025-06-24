@@ -7,12 +7,12 @@ ENV TZ=Europe/Paris
 EXPOSE 9000
 
 ## Installation des extensions pour Symfony
- RUN apt-get update && apt-get install -y \
-     zip git openssl libicu-dev libpq-dev libaio1 \
-     locales curl wget tar unzip && \
-     docker-php-ext-install intl pdo pdo_mysql
+RUN apt-get update && apt-get install -y \
+    zip git openssl libicu-dev libpq-dev libaio1 \
+    locales curl wget tar unzip && \
+    docker-php-ext-install intl pdo pdo_mysql
 
- WORKDIR ${APP_DIR}/pokedex/back_end
+WORKDIR ${APP_DIR}/pokedex/back_end
 
 ## Installation de Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
