@@ -4,10 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Pokemon;
 use App\Entity\Type;
-use App\Entity\Sex;
+use App\Entity\Sexe;
 use App\Repository\PokemonRepository;
 use App\Repository\TypeRepository;
-use App\Repository\SexRepository;
+use App\Repository\SexeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -43,7 +43,7 @@ class PokemonController extends AbstractController
     EntityManagerInterface $em,
     Pokemon $pokemon,
     TypeRepository $typeRepo,
-    SexRepository $sexRepo
+    SexeRepository $sexRepo
   ): JsonResponse {
     $data = json_decode($request->getContent(), true);
 
@@ -73,7 +73,7 @@ class PokemonController extends AbstractController
     Request $request,
     EntityManagerInterface $em,
     TypeRepository $typeRepo,
-    SexRepository $sexRepo
+    SexeRepository $sexRepo
   ): JsonResponse {
     $data = json_decode($request->getContent(), true);
 

@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Repository\SexRepository;
+use App\Repository\SexeRepository;
 use App\Repository\TypeRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,8 +18,8 @@ class ReferenceController extends AbstractController
   }
 
   #[Route('/sexes', methods: ['GET'])]
-  public function getSexes(SexRepository $repo): JsonResponse
+  public function getSexes(SexeRepository $repo): JsonResponse
   {
-    return $this->json($repo->findAll(), context: ['groups' => ['sex:read']]);
+    return $this->json($repo->findAll(), context: ['groups' => ['sexe:read']]);
   }
 }
