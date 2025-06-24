@@ -16,7 +16,7 @@ class Pokemon
   #[Groups(['pokemon:read'])]
   private ?int $id = null;
 
-  #[ORM\Column(namez: 'Pokemon', type: 'string', length: 100)]
+  #[ORM\Column(name: 'Pokemon', type: 'string', length: 100)]
   #[Groups(['pokemon:read', 'pokemon:write'])]
   private string $name;
 
