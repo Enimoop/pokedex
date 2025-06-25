@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Pokemons from './Pokemons';
 import Navbar from './Navbar';
+import ModeButton from './ModeButton';
+import AddPokemon from './AddPokemon';
 
 export default function PcContainer() {
   const cellSize = 120;
@@ -27,9 +29,11 @@ export default function PcContainer() {
   ]);
 
   const [showForm, setShowForm] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false); 
+
   const [newPokemonName, setNewPokemonName] = useState('');
   const [newPokemonTypes, setNewPokemonTypes] = useState('');
-  const [newPokemonSize, setNewPokemonSize] =useState('');
+  const [newPokemonSize, setNewPokemonSize] = useState('');
   const [newPokemonSexe, setNewPokemonSexe] = useState('');
   const [newPokemonImageUrl, setNewPokemonImageUrl] = useState('');
   const [newPokemonDescription, setNewPokemonDescription] = useState('');
@@ -106,131 +110,80 @@ export default function PcContainer() {
 
   return (
     <>
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px', marginBottom: '10px' }}>
-         <Navbar />
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginBottom: '10px',
+          position: 'relative',
+          maxWidth: 800,
+          marginLeft: 'auto',
+          marginRight: 'auto',
+        }}
+      >
+        <Navbar />
 
-        <button
-          onClick={() => setShowForm(true)}
-          style={{
-            padding: '5px 10px',
-            fontSize: '0.9rem',
-            cursor: 'pointer',
-            borderRadius: '8px',
-            border: '1px solid #ccc',
-            background: '#e8f5e9',
-            color: 'black',
-          }}
-        >
-          Créer un Pokémon
-        </button>
+        {/* Desktop : bouton visible si plus large que 600px */}
+        {windowWidth > 600 && (
+          <div style={{ position: 'absolute', right: 0 }}>
+            <ModeButton onClick={() => setShowForm(true)} />
+          </div>
+        )}
+
+        {/* Mobile : bouton hamburger si fenêtre <= 600px */}
+        {windowWidth <= 600 && (
+          <div style={{ position: 'absolute', right: 0 }}>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Menu"
+              style={{
+                fontSize: '1.5rem',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '0 10px',
+              }}
+            >
+              &#9776; {/* ≡ hamburger */}
+            </button>
+
+            {menuOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '40px',
+                  right: 0,
+                  background: 'white',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                  borderRadius: '8px',
+                  zIndex: 10,
+                  padding: '10px',
+                }}
+              >
+                <ModeButton
+                  onClick={() => {
+                    setShowForm(true);
+                    setMenuOpen(false);
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* MODALE CSS SIMPLE */}
       {showForm && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 1000,
+        <AddPokemon
+          onAdd={(pokemon) => {
+            setPokemons([...pokemons, pokemon]);
+            setShowForm(false);
           }}
-        >
-          <div
-            style={{
-              background: 'white',
-              padding: '20px',
-              borderRadius: '10px',
-              width: '350px',
-              boxShadow: '0 0 10px rgba(0,0,0,0.25)',
-              position: 'relative',
-            }}
-          >
-            <button
-              onClick={() => setShowForm(false)}
-              style={{
-                position: 'absolute',
-                top: 8,
-                right: 8,
-                background: 'transparent',
-                border: 'none',
-                fontSize: '1.2rem',
-                cursor: 'pointer',
-              }}
-            >
-              ✖
-            </button>
-
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              
-              <input
-                type="text"
-                placeholder="Nom du Pokémon"
-                value={newPokemonName}
-                onChange={(e) => setNewPokemonName(e.target.value)}
-                style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc' }}
-              />
-              
-              <input
-                type="text"
-                placeholder="Taille"
-                value={newPokemonSize}
-                onChange={(e) => setNewPokemonSize(e.target.value)}
-                style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc' }}
-              />
-
-              <input
-                type="text"
-                placeholder="Sexe"
-                value={newPokemonSexe}
-                onChange={(e) => setNewPokemonSexe(e.target.value)}
-                style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc' }}
-              />
-
-              <input
-                type="text"
-                placeholder="Types (séparés par des virgules)"
-                value={newPokemonTypes}
-                onChange={(e) => setNewPokemonTypes(e.target.value)}
-                style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc' }}
-              />
-
-              <input
-                type="text"
-                placeholder="URL de l'image"
-                value={newPokemonImageUrl}
-                onChange={(e) => setNewPokemonImageUrl(e.target.value)}
-                style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc' }}
-              />
-
-              <textarea
-                placeholder="Description"
-                value={newPokemonDescription}
-                onChange={(e) => setNewPokemonDescription(e.target.value)}
-                style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc', height: '80px', resize: 'none' }}
-              />
-
-              <button
-                type="submit"
-                style={{
-                  padding: '8px',
-                  background: '#c8e6c9',
-                  border: '1px solid #ccc',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                }}
-              >
-                Ajouter
-              </button>
-            </form>
-          </div>
-        </div>
+          onClose={() => setShowForm(false)}
+        />
       )}
+
 
       <div
         style={{
@@ -244,10 +197,10 @@ export default function PcContainer() {
       >
         {pokemons.map(pokemon => (
           <Pokemons
-            key={p.id}
-            pokemon={p}
-            style={getPositionStyle(p.position)}
-            onClick={() => handleClick(p)}
+            key={pokemon.id}
+            pokemon={pokemon}
+            style={getPositionStyle(pokemon.position)}
+            onClick={() => handleClick(pokemon)}
           />
         ))}
       </div>
