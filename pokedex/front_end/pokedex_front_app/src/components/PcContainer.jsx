@@ -14,6 +14,9 @@ export default function PcContainer() {
   const [showForm, setShowForm] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false); 
 
+  const [pokemons, setPokemons] = useState([]);
+
+
   const [newPokemonName, setNewPokemonName] = useState('');
   const [newPokemonTypes, setNewPokemonTypes] = useState('');
   const [newPokemonSize, setNewPokemonSize] = useState('');
