@@ -155,7 +155,6 @@ export default function PcContainer() {
           <Pokemons
             key={pokemon.id}
             pokemon={pokemon}
-            style={getPositionStyle(pokemon.position)}
             onClick={() => handleClick(pokemon)}
           />
         ))}
