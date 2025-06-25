@@ -12,22 +12,14 @@ export default function PcContainer() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   const [showForm, setShowForm] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false); 
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const [mode, setMode] = useState('select');  // mode choisi
 
   const [pokemons, setPokemons] = useState([]);
 
+  const [selectedPokemon, setSelectedPokemon] = useState(null);
 
-  const [newPokemonName, setNewPokemonName] = useState('');
-  const [newPokemonTypes, setNewPokemonTypes] = useState('');
-  const [newPokemonSize, setNewPokemonSize] = useState('');
-  const [newPokemonSexe, setNewPokemonSexe] = useState('');
-  const [newPokemonImageUrl, setNewPokemonImageUrl] = useState('');
-  const [newPokemonDescription, setNewPokemonDescription] = useState('');
-
-  // État pour stocker le Pokémon sélectionné
-    const [selectedPokemon, setSelectedPokemon] = useState(null);
-
-  // Met à jour la largeur à chaque redimensionnement
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
@@ -45,7 +37,6 @@ export default function PcContainer() {
         return res.json();
       })
       .then(pokemons => {
-        console.log('Données reçues depuis l’API :', pokemons); // <-- ici le log
         setPokemons(pokemons);
       })
       .catch(error => console.error('Erreur lors du fetch :', error));
@@ -57,16 +48,30 @@ export default function PcContainer() {
   else if (windowWidth > 600) cols = 4;
   else cols = 2;
 
-  
-  // Ouvre la popup avec le pokemon sélectionné
+  // Determine si popup est en mode édition
+  const editMode = mode === 'update';
+
   const handleClick = (pokemon) => {
+    if (mode === 'update' || mode === 'select') {
     setSelectedPokemon(pokemon);
+  } else if (mode === 'add') {
+    setShowForm(true);
+  } else if (mode === 'delete') {
+    if (window.confirm(`Supprimer ${pokemon.name} ?`)) {
+      setPokemons(pokemons.filter(p => p.id !== pokemon.id));
+    }
+  }
   };
 
-  // Ferme la popup
   const handleClose = () => {
     setSelectedPokemon(null);
   };
+
+  const handleAddPokemon = (pokemon) => {
+    setPokemons([...pokemons, pokemon]);
+    setShowForm(false);
+  };
+
   return (
     <>
       <div
@@ -83,14 +88,20 @@ export default function PcContainer() {
       >
         <Navbar />
 
-        {/* Desktop : bouton visible si plus large que 600px */}
         {windowWidth > 600 && (
           <div style={{ position: 'absolute', right: 0 }}>
-            <ModeButton onClick={() => setShowForm(true)} />
+            <ModeButton
+              mode={mode}
+              setMode={(m) => {
+                setMode(m);
+                if (m === 'add') setShowForm(true);
+                else setShowForm(false);
+                setSelectedPokemon(null);
+              }}
+            />
           </div>
         )}
 
-        {/* Mobile : bouton hamburger si fenêtre <= 600px */}
         {windowWidth <= 600 && (
           <div style={{ position: 'absolute', right: 0 }}>
             <button
@@ -104,7 +115,7 @@ export default function PcContainer() {
                 padding: '0 10px',
               }}
             >
-              &#9776; {/* ≡ hamburger */}
+              &#9776;
             </button>
 
             {menuOpen && (
@@ -121,8 +132,12 @@ export default function PcContainer() {
                 }}
               >
                 <ModeButton
-                  onClick={() => {
-                    setShowForm(true);
+                  mode={mode}
+                  setMode={(m) => {
+                    setMode(m);
+                    if (m === 'add') setShowForm(true);
+                    else setShowForm(false);
+                    setSelectedPokemon(null);
                     setMenuOpen(false);
                   }}
                 />
@@ -132,17 +147,9 @@ export default function PcContainer() {
         )}
       </div>
 
-      {/* MODALE CSS SIMPLE */}
       {showForm && (
-        <AddPokemon
-          onAdd={(pokemon) => {
-            setPokemons([...pokemons, pokemon]);
-            setShowForm(false);
-          }}
-          onClose={() => setShowForm(false)}
-        />
+        <AddPokemon onAdd={handleAddPokemon} onClose={() => setShowForm(false)} />
       )}
-
 
       <div
         style={{
@@ -162,9 +169,12 @@ export default function PcContainer() {
           />
         ))}
 
-        {/* Popup, affichée seulement si un pokemon est sélectionné */}
         {selectedPokemon && (
-          <PokedexPopup pokemon={selectedPokemon} onClose={handleClose} />
+          <PokedexPopup
+            pokemon={selectedPokemon}
+            onClose={handleClose}
+            editMode={mode === 'update'}
+          />
         )}
       </div>
     </>
