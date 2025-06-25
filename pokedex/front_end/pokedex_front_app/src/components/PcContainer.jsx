@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Pokemons from './Pokemons';
 import Navbar from './Navbar';
+import PokedexPopup from './PokedexPopup';
 import ModeButton from './ModeButton';
 import AddPokemon from './AddPokemon';
 
@@ -9,27 +10,12 @@ export default function PcContainer() {
   const gap = 10;
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [pokemons, setPokemons] = useState([
-    {
-      id: 1,
-      name: 'Bulbasaur',
-      types: ['Plante', 'Poison'],
-      imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png',
-      description: 'Bulbasaur est un Pokémon de type Plante et Poison.',
-      position: 0,
-    },
-    {
-      id: 2,
-      name: 'Charmeleon',
-      types: ['Feu'],
-      imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png',
-      description: 'Charmeleon est un Pokémon de type Feu.',
-      position: 4,
-    },
-  ]);
 
   const [showForm, setShowForm] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false); 
+
+  const [pokemons, setPokemons] = useState([]);
+
 
   const [newPokemonName, setNewPokemonName] = useState('');
   const [newPokemonTypes, setNewPokemonTypes] = useState('');
@@ -38,6 +24,10 @@ export default function PcContainer() {
   const [newPokemonImageUrl, setNewPokemonImageUrl] = useState('');
   const [newPokemonDescription, setNewPokemonDescription] = useState('');
 
+  // État pour stocker le Pokémon sélectionné
+    const [selectedPokemon, setSelectedPokemon] = useState(null);
+
+  // Met à jour la largeur à chaque redimensionnement
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
@@ -65,49 +55,18 @@ export default function PcContainer() {
   if (windowWidth > 1200) cols = 8;
   else if (windowWidth > 900) cols = 6;
   else if (windowWidth > 600) cols = 4;
+  else cols = 2;
 
-  let rows = cols <= 4 ? 4 : 6;
-
-  const getPositionStyle = (pos) => {
-    const x = (pos % cols) * (cellSize + gap);
-    const y = Math.floor(pos / cols) * (cellSize + gap);
-    return {
-      position: 'absolute',
-      top: y,
-      left: x,
-      width: cellSize,
-      height: cellSize,
-      cursor: 'pointer',
-    };
-  };
-
+  
+  // Ouvre la popup avec le pokemon sélectionné
   const handleClick = (pokemon) => {
-    alert(`Tu as cliqué sur ${pokemon.name}`);
+    setSelectedPokemon(pokemon);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!newPokemonName.trim() || !newPokemonImageUrl.trim()) return;
-
-    const newPokemon = {
-      id: Date.now(),
-      name: newPokemonName,
-      types: newPokemonTypes.split(',').map((t) => t.trim()),
-      imageUrl: newPokemonImageUrl,
-      description: newPokemonDescription,
-      position: pokemons.length,
-    };
-
-    setPokemons([...pokemons, newPokemon]);
-    setNewPokemonName('');
-    setNewPokemonTypes('');
-    setNewPokemonSize('');
-    setNewPokemonSexe('');
-    setNewPokemonImageUrl('');
-    setNewPokemonDescription('');
-    setShowForm(false);
+  // Ferme la popup
+  const handleClose = () => {
+    setSelectedPokemon(null);
   };
-
   return (
     <>
       <div
@@ -199,10 +158,14 @@ export default function PcContainer() {
           <Pokemons
             key={pokemon.id}
             pokemon={pokemon}
-            style={getPositionStyle(pokemon.position)}
             onClick={() => handleClick(pokemon)}
           />
         ))}
+
+        {/* Popup, affichée seulement si un pokemon est sélectionné */}
+        {selectedPokemon && (
+          <PokedexPopup pokemon={selectedPokemon} onClose={handleClose} />
+        )}
       </div>
     </>
   );
