@@ -51,16 +51,23 @@ export default function PcContainer() {
   // Determine si popup est en mode édition
   const editMode = mode === 'update';
 
+  const handleUpdateSuccess = (updatedPokemon) => {
+    setPokemons((prevPokemons) =>
+      prevPokemons.map(p => (p.id === updatedPokemon.id ? updatedPokemon : p))
+    );
+    setSelectedPokemon(updatedPokemon); // Optionnel, garde la popup à jour
+  };
+
   const handleClick = (pokemon) => {
     if (mode === 'update' || mode === 'select') {
-    setSelectedPokemon(pokemon);
-  } else if (mode === 'add') {
-    setShowForm(true);
-  } else if (mode === 'delete') {
-    if (window.confirm(`Supprimer ${pokemon.name} ?`)) {
-      setPokemons(pokemons.filter(p => p.id !== pokemon.id));
+      setSelectedPokemon(pokemon);
+    } else if (mode === 'add') {
+      setShowForm(true);
+    } else if (mode === 'delete') {
+      if (window.confirm(`Supprimer ${pokemon.name} ?`)) {
+        setPokemons(pokemons.filter(p => p.id !== pokemon.id));
+      }
     }
-  }
   };
 
   const handleClose = () => {
@@ -172,8 +179,9 @@ export default function PcContainer() {
         {selectedPokemon && (
           <PokedexPopup
             pokemon={selectedPokemon}
-            onClose={handleClose}
+            onClose={() => setSelectedPokemon(null)}
             editMode={mode === 'update'}
+            onUpdateSuccess={handleUpdateSuccess}  // <-- ici
           />
         )}
       </div>

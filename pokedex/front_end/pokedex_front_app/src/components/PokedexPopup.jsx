@@ -1,38 +1,70 @@
 import React, { useState, useEffect } from 'react';
 import PokemonTypeBadge from './PokemonTypeBadge';
 
-const TYPES = [
-  'Normal', 'Feu', 'Eau', 'Plante', 'Électrik', 'Glace', 'Combat',
-  'Poison', 'Sol', 'Vol', 'Psy', 'Insecte', 'Roche', 'Spectre',
-  'Dragon', 'Ténèbres', 'Acier', 'Fée'
-];
+export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpdateSuccess }) {
+  const [types, setTypes] = useState([]);
+  const [sexes, setSexes] = useState([]);
 
-const SEXES = [
-  { id: 1, libelle: '♂' },
-  { id: 2, libelle: '♀' },
-  { id: 3, libelle: 'Inconnu' }
-];
-
-export default function PokedexPopup({ pokemon, onClose, editMode = false }) {
-  // Suppression de l'état local editMode, on utilise uniquement la prop
-
-  // États pour les champs éditables (initialisés aux valeurs actuelles)
   const [name, setName] = useState(pokemon.name);
   const [description, setDescription] = useState(pokemon.description || '');
-  const [type1, setType1] = useState(pokemon.type1?.libelle || '');
-  const [type2, setType2] = useState(pokemon.type2?.libelle || '');
+  const [type1, setType1] = useState(pokemon.type1?.id || '');
+  const [type2, setType2] = useState(pokemon.type2?.id || '');
   const [gender, setGender] = useState(pokemon.sex?.id || '');
 
-  // Synchronisation des champs si le pokemon change
+  useEffect(() => {
+    fetch('https://localhost/api/references/types')
+      .then(res => {
+        if (!res.ok) throw new Error('Erreur réseau lors du fetch des types');
+        return res.json();
+      })
+      .then(data => setTypes(data))
+      .catch(() => setTypes([]));
+
+    fetch('https://localhost/api/references/sexes')
+      .then(res => {
+        if (!res.ok) throw new Error('Erreur réseau lors du fetch des sexes');
+        return res.json();
+      })
+      .then(data => setSexes(data))
+      .catch(() => setSexes([]));
+  }, []);
+
   useEffect(() => {
     setName(pokemon.name);
     setDescription(pokemon.description || '');
-    setType1(pokemon.type1?.libelle || '');
-    setType2(pokemon.type2?.libelle || '');
+    setType1(pokemon.type1?.id || '');
+    setType2(pokemon.type2?.id || '');
     setGender(pokemon.sex?.id || '');
   }, [pokemon]);
 
   if (!pokemon) return null;
+
+  const handleSubmit = () => {
+    const payload = {
+      name,
+      description,
+      type1: type1 || null,
+      type2: type2 || null,
+      sex: gender || null,
+    };
+
+    fetch(`https://localhost/api/pokemons/${pokemon.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Erreur lors de la mise à jour');
+        return res.json();
+      })
+      .then(updatedPokemon => {
+        if (onUpdateSuccess) onUpdateSuccess(updatedPokemon);
+        onClose();
+      })
+      .catch(err => {
+        alert('Erreur lors de la mise à jour : ' + err.message);
+      });
+  };
 
   return (
     <div
@@ -61,130 +93,153 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false }) {
           fontFamily: "'Helvetica Neue', Arial, sans-serif",
           color: '#333',
           position: 'relative',
+          flexDirection: 'column',
+          gap: 20,
         }}
       >
+        <div style={{ display: 'flex' }}>
+          {/* Colonne gauche */}
+          <div style={{ flex: '1 0 25%', textAlign: 'center' }}>
+            <img
+              src={pokemon.photo}
+              alt={pokemon.name}
+              style={{ width: '100%', maxWidth: 200, objectFit: 'contain' }}
+            />
+            {editMode ? (
+              <>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  style={{ marginTop: 10, marginBottom: 5, width: '90%', fontSize: 24, fontWeight: 'bold' }}
+                />
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 10 }}>
+                  <select
+                    value={type1}
+                    onChange={(e) => setType1(e.target.value)}
+                    style={{ fontSize: 16, fontWeight: 'bold' }}
+                  >
+                    <option value="">Type 1</option>
+                    {types.map(t => (
+                      <option key={t.id} value={t.id}>{t.libelle}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={type2}
+                    onChange={(e) => setType2(e.target.value)} 
+                    style={{ fontSize: 16, fontWeight: 'bold' }}
+                  >
+                    <option value="">Type 2</option>
+                    {types.map(t => (
+                      <option key={t.id} value={t.id}>{t.libelle}</option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 style={{ marginTop: 10, marginBottom: 5 }}>{name}</h2>
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: 5 }}>
+                  {(pokemon.type1 || pokemon.type2) ? (
+                    <>
+                      {pokemon.type1 && <PokemonTypeBadge key={pokemon.type1.id} type={pokemon.type1.libelle} />}
+                      {pokemon.type2 && <PokemonTypeBadge key={pokemon.type2.id} type={pokemon.type2.libelle} />}
+                    </>
+                  ) : (
+                    <span style={{ color: '#555' }}>Aucun type</span>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
 
-        {/* Colonne gauche */}
-        <div style={{ flex: '1 0 25%', textAlign: 'center' }}>
-          <img
-            src={pokemon.photo}
-            alt={pokemon.name}
-            style={{ width: '100%', maxWidth: 200, objectFit: 'contain' }}
-          />
+          {/* Colonne droite */}
+          <div style={{
+            flex: '1 0 auto',
+            paddingLeft: 20,
+            minHeight: 300,
+            boxSizing: 'border-box',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-start',
+            maxWidth: 350,
+            width: '100%'
+          }}>
+            <h3>Description</h3>
+            {editMode ? (
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={5}
+                style={{ width: '100%', fontSize: 16, padding: 8, resize: 'vertical', flexGrow: 1 }}
+              />
+            ) : (
+              <p
+                style={{
+                  whiteSpace: 'normal',
+                  wordWrap: 'break-word',
+                  overflowWrap: 'break-word',
+                  maxWidth: '100%',
+                  maxHeight: '150px',
+                  overflowY: 'auto',
+                  margin: 0,
+                }}
+              >
+                {description || 'Pas de description disponible.'}
+              </p>
+            )}
 
-          {editMode ? (
-            <>
+            <h4>Taille</h4>
+            {editMode ? (
               <input
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                style={{ marginTop: 10, marginBottom: 5, width: '90%', fontSize: 24, fontWeight: 'bold' }}
+                value={pokemon.taille || ''}
+                readOnly
+                style={{ fontSize: 16, padding: 4, marginBottom: 10 }}
+                placeholder="Taille (non modifiable)"
               />
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 10 }}>
-                <select
-                  value={type1}
-                  onChange={(e) => setType1(e.target.value)}
-                  style={{ fontSize: 16, fontWeight: 'bold' }}
-                >
-                  <option value="">Type 1</option>
-                  {TYPES.map((t) => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
-                <select
-                  value={type2}
-                  onChange={(e) => setType2(e.target.value)}
-                  style={{ fontSize: 16, fontWeight: 'bold' }}
-                >
-                  <option value="">Type 2</option>
-                  {TYPES.map((t) => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
-              </div>
-            </>
-          ) : (
-            <>
-              <h2 style={{ marginTop: 10, marginBottom: 5 }}>{name}</h2>
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: 5 }}>
-                {(pokemon.type1 || pokemon.type2) ? (
-                  <>
-                    {pokemon.type1 && <PokemonTypeBadge key={pokemon.type1.id} type={pokemon.type1.libelle} />}
-                    {pokemon.type2 && <PokemonTypeBadge key={pokemon.type2.id} type={pokemon.type2.libelle} />}
-                  </>
-                ) : (
-                  <span style={{ color: '#555' }}>Aucun type</span>
-                )}
-              </div>
-            </>
-          )}
+            ) : (
+              <p>{pokemon.taille ? `${pokemon.taille} m` : 'Inconnue'}</p>
+            )}
+
+            <h4>Sexe</h4>
+            {editMode ? (
+              <select
+                value={gender}
+                onChange={e => setGender(parseInt(e.target.value))}
+                style={{ fontSize: 16, padding: 4 }}
+              >
+                <option value="">Sélectionner</option>
+                {sexes.map(s => (
+                  <option key={s.id} value={s.id}>{s.libelle}</option>
+                ))}
+              </select>
+            ) : (
+              <p>{pokemon.sex?.libelle || 'Inconnu'}</p>
+            )}
+          </div>
         </div>
 
-        {/* Colonne droite */}
-        <div style={{
-          flex: '1 0 auto',
-          paddingLeft: 20,
-          minHeight: 300,
-          boxSizing: 'border-box',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-start',
-          maxWidth: 350,
-          width: '100%'
-        }}>
-          <h3>Description</h3>
-          {editMode ? (
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={5}
-              style={{ width: '100%', fontSize: 16, padding: 8, resize: 'vertical', flexGrow: 1 }}
-            />
-          ) : (
-            <p
+        {/* Bouton valider uniquement si editMode */}
+        {editMode && (
+          <div style={{ textAlign: 'right' }}>
+            <button
+              onClick={handleSubmit}
               style={{
-                whiteSpace: 'normal',
-                wordWrap: 'break-word',
-                overflowWrap: 'break-word',
-                maxWidth: '100%',
-                maxHeight: '150px',
-                overflowY: 'auto',
-                margin: 0,
+                padding: '8px 16px',
+                backgroundColor: '#4caf50',
+                border: 'none',
+                borderRadius: '6px',
+                color: 'white',
+                fontWeight: 'bold',
+                cursor: 'pointer',
               }}
             >
-              {description || 'Pas de description disponible.'}
-            </p>
-          )}
+              Valider
+            </button>
+          </div>
+        )}
 
-          <h4>Taille</h4>
-          {editMode ? (
-            <input
-              type="text"
-              value={pokemon.taille || ''}
-              readOnly
-              style={{ fontSize: 16, padding: 4, marginBottom: 10 }}
-              placeholder="Taille (non modifiable)"
-            />
-          ) : (
-            <p>{pokemon.taille ? `${pokemon.taille} m` : 'Inconnue'}</p>
-          )}
-
-          <h4>Sexe</h4>
-          {editMode ? (
-            <select
-              value={gender}
-              onChange={e => setGender(parseInt(e.target.value))}
-              style={{ fontSize: 16, padding: 4 }}
-            >
-              <option value="">Sélectionner</option>
-              {SEXES.map(s => (
-                <option key={s.id} value={s.id}>{s.libelle}</option>
-              ))}
-            </select>
-          ) : (
-            <p>{pokemon.sex?.libelle || 'Inconnu'}</p>
-          )}
-        </div>
       </div>
     </div>
   );
