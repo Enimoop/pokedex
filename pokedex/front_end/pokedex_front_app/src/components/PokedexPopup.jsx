@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PokemonTypeBadge from './PokemonTypeBadge';
 
 const TYPES = [
@@ -7,17 +7,30 @@ const TYPES = [
   'Dragon', 'Ténèbres', 'Acier', 'Fée'
 ];
 
-const SEXES = ['♂', '♀', 'Inconnu'];
+const SEXES = [
+  { id: 1, libelle: '♂' },
+  { id: 2, libelle: '♀' },
+  { id: 3, libelle: 'Inconnu' }
+];
 
-export default function InformationPopup({ pokemon, onClose }) {
-  const [editMode, setEditMode] = useState(false);
+export default function PokedexPopup({ pokemon, onClose, editMode = false }) {
+  // Suppression de l'état local editMode, on utilise uniquement la prop
 
   // États pour les champs éditables (initialisés aux valeurs actuelles)
   const [name, setName] = useState(pokemon.name);
   const [description, setDescription] = useState(pokemon.description || '');
-  const [type1, setType1] = useState(pokemon.types?.[0] || '');
-  const [type2, setType2] = useState(pokemon.types?.[1] || '');
-  const [gender, setGender] = useState(pokemon.gender || '');
+  const [type1, setType1] = useState(pokemon.type1?.libelle || '');
+  const [type2, setType2] = useState(pokemon.type2?.libelle || '');
+  const [gender, setGender] = useState(pokemon.sex?.id || '');
+
+  // Synchronisation des champs si le pokemon change
+  useEffect(() => {
+    setName(pokemon.name);
+    setDescription(pokemon.description || '');
+    setType1(pokemon.type1?.libelle || '');
+    setType2(pokemon.type2?.libelle || '');
+    setGender(pokemon.sex?.id || '');
+  }, [pokemon]);
 
   if (!pokemon) return null;
 
@@ -50,24 +63,6 @@ export default function InformationPopup({ pokemon, onClose }) {
           position: 'relative',
         }}
       >
-        {/* Bouton crayon en haut à droite */}
-        <button
-          onClick={() => setEditMode(!editMode)}
-          style={{
-            position: 'absolute',
-            top: 10,
-            right: 10,
-            cursor: 'pointer',
-            border: 'none',
-            background: 'none',
-            fontSize: 20,
-            color: '#666',
-          }}
-          aria-label={editMode ? 'Quitter le mode édition' : 'Entrer en mode édition'}
-          title={editMode ? 'Quitter le mode édition' : 'Modifier'}
-        >
-          ✏️
-        </button>
 
         {/* Colonne gauche */}
         <div style={{ flex: '1 0 25%', textAlign: 'center' }}>
@@ -134,7 +129,7 @@ export default function InformationPopup({ pokemon, onClose }) {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-start',
-          maxWidth: 350,  // ou la largeur max que tu souhaites
+          maxWidth: 350,
           width: '100%'
         }}>
           <h3>Description</h3>
@@ -151,9 +146,9 @@ export default function InformationPopup({ pokemon, onClose }) {
                 whiteSpace: 'normal',
                 wordWrap: 'break-word',
                 overflowWrap: 'break-word',
-                maxWidth: '100%', // largeur max égale au parent
-                maxHeight: '150px', // hauteur max fixe (ajuste à ta convenance)
-                overflowY: 'auto', // scroll vertical si contenu trop grand
+                maxWidth: '100%',
+                maxHeight: '150px',
+                overflowY: 'auto',
                 margin: 0,
               }}
             >
@@ -190,8 +185,6 @@ export default function InformationPopup({ pokemon, onClose }) {
             <p>{pokemon.sex?.libelle || 'Inconnu'}</p>
           )}
         </div>
-
-
       </div>
     </div>
   );
