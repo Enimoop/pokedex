@@ -13,7 +13,7 @@ export default function PcCell({ pokemon, onClick }) {
       style={{ cursor: pokemon ? 'pointer' : 'default' }}
       title={pokemon ? pokemon.name : ''}
     >
-      {pokemon && <img src={pokemon.imageUrl} alt={pokemon.name} className="pokemon-image" />}
+      {pokemon && <img src={pokemon.photo} alt={pokemon.name} className="pokemon-image" />}
     </div>
   );
 }
