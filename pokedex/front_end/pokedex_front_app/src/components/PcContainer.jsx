@@ -18,6 +18,16 @@ export default function PcContainer() {
 
   const [pokemons, setPokemons] = useState([]);
 
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const pokemonsPerPage = 48;
+  const totalPages = Math.ceil(pokemons.length / pokemonsPerPage);
+
+  const displayedPokemons = pokemons.slice(
+    currentPage * pokemonsPerPage,
+    (currentPage + 1) * pokemonsPerPage
+  );
+
   const [selectedPokemon, setSelectedPokemon] = useState(null);
 
   useEffect(() => {
@@ -65,19 +75,19 @@ export default function PcContainer() {
       setShowForm(true);
     } else if (mode === 'delete') {
       if (window.confirm(`Supprimer ${pokemon.name} ?`)) {
-      // Appel API pour supprimer le pokemon
-      fetch(`https://localhost/api/pokemons/${pokemon.id}`, {
-        method: 'DELETE',
-      })
-      .then(res => {
-        if (!res.ok) throw new Error('Erreur lors de la suppression');
-        // Mise à jour locale après suppression réussie
-        setPokemons(pokemons.filter(p => p.id !== pokemon.id));
-      })
-      .catch(err => {
-        alert('Erreur lors de la suppression : ' + err.message);
-      });
-    }
+        // Appel API pour supprimer le pokemon
+        fetch(`https://localhost/api/pokemons/${pokemon.id}`, {
+          method: 'DELETE',
+        })
+          .then(res => {
+            if (!res.ok) throw new Error('Erreur lors de la suppression');
+            // Mise à jour locale après suppression réussie
+            setPokemons(pokemons.filter(p => p.id !== pokemon.id));
+          })
+          .catch(err => {
+            alert('Erreur lors de la suppression : ' + err.message);
+          });
+      }
     }
   };
 
@@ -104,7 +114,11 @@ export default function PcContainer() {
           marginRight: 'auto',
         }}
       >
-        <Navbar />
+        <Navbar
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
+        />
 
         {windowWidth > 600 && (
           <div style={{ position: 'absolute', right: 0 }}>
@@ -179,7 +193,7 @@ export default function PcContainer() {
           margin: '0 auto',
         }}
       >
-        {pokemons.map(pokemon => (
+        {displayedPokemons.map(pokemon => (
           <Pokemons
             key={pokemon.id}
             pokemon={pokemon}
