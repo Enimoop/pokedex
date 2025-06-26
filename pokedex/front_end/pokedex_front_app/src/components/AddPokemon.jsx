@@ -26,9 +26,21 @@ export default function AddPokemon({ onAdd, onClose }) {
 
   const handleSubmit = (e) => {
   e.preventDefault();
-  if (!name.trim() || !photo.trim()) return;
 
- const payload = {
+  // Vérification des champs obligatoires (name, size, sex, type1, photo, description)
+  if (
+    !name.trim() ||
+    !size.trim() ||
+    !sex.trim() ||
+    !type1.trim() ||
+    !photo.trim() ||
+    !description.trim()
+  ) {
+    alert('Merci de remplir tous les champs obligatoires (sauf Type 2).');
+    return;
+  }
+
+  const payload = {
     name,
     taille: size,
     sex: sex ? parseInt(sex, 10) : null,
@@ -95,6 +107,7 @@ export default function AddPokemon({ onAdd, onClose }) {
           <input
             type="text"
             placeholder="Nom du Pokémon"
+            maxLength={18}
             value={name}
             onChange={(e) => setName(e.target.value)}
             style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc' }}
@@ -147,6 +160,7 @@ export default function AddPokemon({ onAdd, onClose }) {
           <textarea
             placeholder="Description"
             value={description}
+            maxLength={200}
             onChange={(e) => setDescription(e.target.value)}
             style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc', height: '80px', resize: 'none' }}
           />
