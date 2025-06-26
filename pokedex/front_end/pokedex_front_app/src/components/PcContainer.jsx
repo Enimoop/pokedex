@@ -65,8 +65,19 @@ export default function PcContainer() {
       setShowForm(true);
     } else if (mode === 'delete') {
       if (window.confirm(`Supprimer ${pokemon.name} ?`)) {
+      // Appel API pour supprimer le pokemon
+      fetch(`https://localhost/api/pokemons/${pokemon.id}`, {
+        method: 'DELETE',
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Erreur lors de la suppression');
+        // Mise à jour locale après suppression réussie
         setPokemons(pokemons.filter(p => p.id !== pokemon.id));
-      }
+      })
+      .catch(err => {
+        alert('Erreur lors de la suppression : ' + err.message);
+      });
+    }
     }
   };
 
