@@ -118,7 +118,12 @@ export default function PcContainer() {
         />
 
         {windowWidth > 600 && (
-          <div style={{ position: 'absolute', right: 0 }}>
+          <div style={{
+            position: windowWidth > 800 ? 'absolute' : 'relative',
+            right: windowWidth > 800 ? 0 : 'auto',
+            marginTop: windowWidth > 800 ? 0 : 10,
+            zIndex: 10,
+          }}>
             <ModeButton
               mode={mode}
               setMode={(m) => {
@@ -131,8 +136,9 @@ export default function PcContainer() {
           </div>
         )}
 
+
         {windowWidth <= 600 && (
-          <div style={{ position: 'absolute', right: 0 }}>
+          <div style={{ position: 'relative', right: 'auto', marginTop: 10 }}>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Menu"
@@ -177,8 +183,16 @@ export default function PcContainer() {
       </div>
 
       {showForm && (
-        <AddPokemon onAdd={handleAddPokemon} onClose={() => setShowForm(false)} />
+        <AddPokemon
+          onAdd={handleAddPokemon}
+          onClose={() => {
+            setShowForm(false);
+            setMode('select');
+            setSelectedPokemon(null);
+          }}
+        />
       )}
+
 
       <div
         style={{
