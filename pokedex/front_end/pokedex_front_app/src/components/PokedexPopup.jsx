@@ -220,7 +220,6 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
           </div>
         </div>
 
-        {/* Bouton valider uniquement si editMode */}
         {editMode && (
           <div style={{ textAlign: 'right' }}>
             <button
