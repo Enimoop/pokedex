@@ -75,19 +75,35 @@ class PokemonController extends AbstractController
     TypeRepository $typeRepo,
     SexeRepository $sexRepo
   ): JsonResponse {
+    dump($request->getContent());
     $data = json_decode($request->getContent(), true);
+    dump($data);
 
     $pokemon = new Pokemon();
     $pokemon->setName($data['name'] ?? '');
 
-    $type1 = $typeRepo->find($data['type1'] ?? null);
-    $pokemon->setType1($type1);
+    if (isset($data['types']) && is_array($data['types'])) {
+      $type1 = isset($data['types'][0]) ? $typeRepo->find($data['types'][0]) : null;
+      $type2 = isset($data['types'][1]) ? $typeRepo->find($data['types'][1]) : null;
+      $pokemon->setType1($type1);
+      $pokemon->setType2($type2);
+    } else {
+      $pokemon->setType1(null);
+      $pokemon->setType2(null);
+    }
 
-    $type2 = $typeRepo->find($data['type2'] ?? null);
-    $pokemon->setType2($type2);
-
-    $sex = $sexRepo->find($data['sex'] ?? null);
+    $sex = isset($data['sex']) ? $sexRepo->find($data['sex']) : null;
     $pokemon->setSex($sex);
+
+    if (isset($data['taille'])) {
+      $pokemon->setTaille($data['taille']);
+    }
+    if (isset($data['photo'])) {
+      $pokemon->setPhoto($data['photo']);
+    }
+
+    $pokemon->setDescription(trim($data['description'] ?? '') ?: 'Pas de description.');
+
 
     $em->persist($pokemon);
     $em->flush();
