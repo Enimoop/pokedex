@@ -4,13 +4,14 @@ import PokemonTypeBadge from './PokemonTypeBadge';
 export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpdateSuccess }) {
   const [types, setTypes] = useState([]);
   const [sexes, setSexes] = useState([]);
-
   const [name, setName] = useState(pokemon.name);
   const [description, setDescription] = useState(pokemon.description || '');
   const [type1, setType1] = useState(pokemon.type1?.id || '');
   const [type2, setType2] = useState(pokemon.type2?.id || '');
   const [gender, setGender] = useState(pokemon.sex?.id || '');
   const [photo, setPhoto] = useState(pokemon.photo);
+  const [size, setSize] = useState(pokemon.taille || '');
+
 
   useEffect(() => {
     fetch('https://localhost/api/references/types')
@@ -36,19 +37,47 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
     setType1(pokemon.type1?.id || '');
     setType2(pokemon.type2?.id || '');
     setGender(pokemon.sex?.id || '');
+    setSize(pokemon.taille || '');
     setPhoto(pokemon.photo || '');
   }, [pokemon]);
 
   if (!pokemon) return null;
 
   const handleSubmit = () => {
+    if (!photo.trim()) {
+      alert('Le champ "URL de la photo" est obligatoire.');
+      return;
+    }
+    if (!name.trim()) {
+      alert('Le champ "Nom" est obligatoire.');
+      return;
+    }
+    if (!description.trim()) {
+      alert('Le champ "Description" est obligatoire.');
+      return;
+    }
+    const tailleNumber = parseFloat(size);
+    if (isNaN(tailleNumber) || tailleNumber <= 0) {
+      alert('Le champ "Taille" doit être un nombre valide supérieur à 0 avec un point comme séparateur décimal.');
+      return;
+    }
+    if (!gender) {
+      alert('Le champ "Sexe" est obligatoire.');
+      return;
+    }
+    if (!type1) {
+      alert('Le champ "Type 1" est obligatoire.');
+      return;
+    }
+
     const payload = {
       name,
       description,
-      type1: type1 ? Number(type1) : null,
+      type1: Number(type1),
       type2: type2 ? Number(type2) : null,
-      sex: gender ? Number(gender) : null,
+      sex: Number(gender),
       photo,
+      taille: tailleNumber,
     };
 
     fetch(`https://localhost/api/pokemons/${pokemon.id}`, {
@@ -62,6 +91,7 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
       })
       .then(updatedPokemon => {
         if (onUpdateSuccess) onUpdateSuccess(updatedPokemon);
+        alert('Mise à jour réussie !');
         onClose();
       })
       .catch(err => {
@@ -244,10 +274,13 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
               {editMode ? (
                 <input
                   type="text"
-                  value={pokemon.taille || ''}
-                  readOnly
+                  value={size}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(',', '.');
+                    setSize(val);
+                  }}
+                  placeholder="Taille en mètres"
                   style={{ fontSize: 16, padding: 4, width: '100%', boxSizing: 'border-box' }}
-                  placeholder="Taille (non modifiable)"
                 />
               ) : (
                 <p style={{ margin: 0 }}>{pokemon.taille ? `${pokemon.taille} m` : 'Inconnue'}</p>
