@@ -14,7 +14,7 @@ export default function PcContainer() {
   const [showForm, setShowForm] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const [mode, setMode] = useState('select');  // mode choisi
+  const [mode, setMode] = useState('select');
 
   const [pokemons, setPokemons] = useState([]);
 
@@ -58,14 +58,13 @@ export default function PcContainer() {
   else if (windowWidth > 600) cols = 4;
   else cols = 2;
 
-  // Determine si popup est en mode édition
   const editMode = mode === 'update';
 
   const handleUpdateSuccess = (updatedPokemon) => {
     setPokemons((prevPokemons) =>
       prevPokemons.map(p => (p.id === updatedPokemon.id ? updatedPokemon : p))
     );
-    setSelectedPokemon(updatedPokemon); // Optionnel, garde la popup à jour
+    setSelectedPokemon(updatedPokemon);
   };
 
   const handleClick = (pokemon) => {
@@ -75,13 +74,11 @@ export default function PcContainer() {
       setShowForm(true);
     } else if (mode === 'delete') {
       if (window.confirm(`Supprimer ${pokemon.name} ?`)) {
-        // Appel API pour supprimer le pokemon
         fetch(`https://localhost/api/pokemons/${pokemon.id}`, {
           method: 'DELETE',
         })
           .then(res => {
             if (!res.ok) throw new Error('Erreur lors de la suppression');
-            // Mise à jour locale après suppression réussie
             setPokemons(pokemons.filter(p => p.id !== pokemon.id));
           })
           .catch(err => {
@@ -206,7 +203,7 @@ export default function PcContainer() {
             pokemon={selectedPokemon}
             onClose={() => setSelectedPokemon(null)}
             editMode={mode === 'update'}
-            onUpdateSuccess={handleUpdateSuccess}  // <-- ici
+            onUpdateSuccess={handleUpdateSuccess}
           />
         )}
       </div>

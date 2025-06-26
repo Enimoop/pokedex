@@ -48,8 +48,7 @@ export default function AddPokemon({ onAdd, onClose }) {
       return res.json();
     })
     .then(createdPokemon => {
-      onAdd(createdPokemon);  // on ajoute le Pokémon retourné par l'API
-      // reset et fermeture
+      onAdd(createdPokemon);
       setName('');
       setType1('');
       setType2('');
