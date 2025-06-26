@@ -45,6 +45,7 @@ class PokemonController extends AbstractController
     TypeRepository $typeRepo,
     SexeRepository $sexRepo
   ): JsonResponse {
+    dump($request->getContent());
     $data = json_decode($request->getContent(), true);
 
     $pokemon->setName($data['name'] ?? $pokemon->getName());
@@ -55,8 +56,24 @@ class PokemonController extends AbstractController
     }
 
     if (array_key_exists('type2', $data)) {
-      $type2 = $typeRepo->find($data['type2']);
-      $pokemon->setType2($type2);
+        if ($data['type2'] !== null) {
+            $type2 = $typeRepo->find((int)$data['type2']);
+            $pokemon->setType2($type2);
+        } else {
+            $pokemon->setType2(null);
+        }
+    }
+
+    if (isset($data['taille'])) {
+      $pokemon->setTaille($data['taille']);
+    }
+
+    if (isset($data['photo'])) {
+      $pokemon->setPhoto($data['photo']);
+    }
+
+    if (isset($data['description'])) {
+      $pokemon->setDescription(trim($data['description']) ?: 'Pas de description.');
     }
 
     if (isset($data['sex'])) {
