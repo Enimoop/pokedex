@@ -5,7 +5,7 @@ const typeImages = {
   Feu: '/assets/types/feu.png',
   Eau: '/assets/types/eau.png',
   Plante: '/assets/types/plante.png',
-  Électrik: '/assets/types/electrik.png',
+  Electrik: '/assets/types/elektrik.png',
   Glace: '/assets/types/glace.png',
   Combat: '/assets/types/combat.png',
   Poison: '/assets/types/poison.png',

@@ -13,8 +13,8 @@ function App() {
           textAlign: 'center',
 
           userSelect: 'none',
-          marginTop: '20px',    // <-- ajoute un margin top
-          marginBottom: '50px', // <-- ajoute un margin bottom
+          marginTop: '20px',
+          marginBottom: '50px', 
         }}
       >
         <h1
@@ -26,7 +26,7 @@ function App() {
             textShadow: '2px 2px 0 #000',
           }}
         >
-          POKEDEX
+          POPOKEDEX
         </h1>
       </header>
 
