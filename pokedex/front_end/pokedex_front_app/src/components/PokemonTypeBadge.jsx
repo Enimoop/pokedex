@@ -16,7 +16,7 @@ const typeImages = {
   Roche: '/assets/types/roche.png',
   Spectre: '/assets/types/spectre.png',
   Dragon: '/assets/types/dragon.png',
-  Ténèbres: '/assets/types/tenebres.png',
+  Ténèbre: '/assets/types/tenebre.png',
   Acier: '/assets/types/acier.png',
   Fée: '/assets/types/fee.png',
 };
