@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function AddPokemon({ onAdd, onClose }) {
   const [typesList, setTypesList] = useState([]);
@@ -12,6 +12,8 @@ export default function AddPokemon({ onAdd, onClose }) {
   const [photo, setPhoto] = useState('');
   const [description, setDescription] = useState('');
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
     fetch('https://localhost/api/references/types')
       .then(res => res.ok ? res.json() : Promise.reject('Erreur fetch types'))
@@ -24,55 +26,77 @@ export default function AddPokemon({ onAdd, onClose }) {
       .catch(() => setSexesList([]));
   }, []);
 
+  function isValidUrl(string) {
+  const pattern = new RegExp(
+    '^(https?:\\/\\/)?' +               
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
+    '((\\d{1,3}\\.){3}\\d{1,3}))' +   
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
+    '(\\?[;&a-z\\d%_.~+=-]*)?' +        
+    '(\\#[-a-z\\d_]*)?$', 'i'            
+  );
+  return !!pattern.test(string);
+}
+
+
   const handleSubmit = (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (
-    !name.trim() ||
-    !size.trim() ||
-    !sex.trim() ||
-    !type1.trim() ||
-    !photo.trim() ||
-    !description.trim()
-  ) {
-    alert('Merci de remplir tous les champs obligatoires (sauf Type 2).');
-    return;
-  }
+    if (
+      !name.trim() ||
+      !size.trim() ||
+      !sex.trim() ||
+      !type1.trim() ||
+      !photo.trim() ||
+      !description.trim()
+    ) {
+      alert('Merci de remplir tous les champs obligatoires (sauf Type 2).');
+      return;
+    }
 
-  const payload = {
-    name,
-    taille: size,
-    sex: sex ? parseInt(sex, 10) : null,
-    types: [type1, type2].filter(t => t).map(t => parseInt(t, 10)),
-    photo,
-    description,
-    position: 0,
+    if (!isValidUrl(photo.trim())) {
+      alert('Veuillez saisir une URL valide pour l\'image.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const payload = {
+      name,
+      taille: size,
+      sex: sex ? parseInt(sex, 10) : null,
+      types: [type1, type2].filter(t => t).map(t => parseInt(t, 10)),
+      photo,
+      description,
+      position: 0,
+    };
+
+    fetch('https://localhost/api/pokemons', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Erreur lors de la création');
+        return res.json();
+      })
+      .then(createdPokemon => {
+        onAdd(createdPokemon);
+        setName('');
+        setType1('');
+        setType2('');
+        setSize('');
+        setSex('');
+        setPhoto('');
+        setDescription('');
+        setIsSubmitting(false);
+        onClose();
+      })
+      .catch(err => {
+        alert('Erreur lors de la création : ' + err.message);
+        setIsSubmitting(false);
+      });
   };
-
-  fetch('https://localhost/api/pokemons', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  })
-    .then(res => {
-      if (!res.ok) throw new Error('Erreur lors de la création');
-      return res.json();
-    })
-    .then(createdPokemon => {
-      onAdd(createdPokemon);
-      setName('');
-      setType1('');
-      setType2('');
-      setSize('');
-      setSex('');
-      setPhoto('');
-      setDescription('');
-      onClose();
-    })
-    .catch(err => {
-      alert('Erreur lors de la création : ' + err.message);
-    });
-};
 
   return (
     <div className="addpokemon-overlay" onClick={onClose}>
@@ -87,7 +111,8 @@ export default function AddPokemon({ onAdd, onClose }) {
             className="addpokemon-input"
           />
           <input
-            type="text"
+            type="number"
+            step="any"
             placeholder="Taille"
             value={size}
             onChange={(e) => setSize(e.target.value)}
@@ -137,7 +162,9 @@ export default function AddPokemon({ onAdd, onClose }) {
             onChange={(e) => setDescription(e.target.value)}
             className="addpokemon-textarea"
           />
-          <button type="submit" className="addpokemon-button">Ajouter</button>
+          <button type="submit" className="addpokemon-button" disabled={isSubmitting}>
+            {isSubmitting ? 'Envoi...' : 'Ajouter'}
+          </button>
         </form>
       </div>
     </div>
