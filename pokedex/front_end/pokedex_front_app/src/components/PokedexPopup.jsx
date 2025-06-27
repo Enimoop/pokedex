@@ -12,6 +12,7 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
   const [photo, setPhoto] = useState(pokemon.photo);
   const [size, setSize] = useState(pokemon.taille || '');
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetch('https://localhost/api/references/types')
@@ -43,9 +44,25 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
 
   if (!pokemon) return null;
 
+  function isValidUrl(string) {
+  const pattern = new RegExp(
+    '^(https?:\\/\\/)?' +               
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + 
+    '((\\d{1,3}\\.){3}\\d{1,3}))' +    
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + 
+    '(\\?[;&a-z\\d%_.~+=-]*)?' +       
+    '(\\#[-a-z\\d_]*)?$', 'i'            
+  );
+  return !!pattern.test(string);
+}
+
   const handleSubmit = () => {
     if (!photo.trim()) {
       alert('Le champ "URL de la photo" est obligatoire.');
+      return;
+    }
+    if (!isValidUrl(photo.trim())) {
+      alert('Veuillez saisir une URL valide pour l\'image.');
       return;
     }
     if (!name.trim()) {
@@ -69,6 +86,8 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
       alert('Le champ "Type 1" est obligatoire.');
       return;
     }
+
+    setIsSubmitting(true); 
 
     const payload = {
       name,
@@ -96,6 +115,9 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
       })
       .catch(err => {
         alert('Erreur lors de la mise à jour : ' + err.message);
+      })
+      .finally(() => {
+        setIsSubmitting(false);
       });
   };
 
@@ -184,12 +206,11 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
               <h4>Taille</h4>
               {editMode ? (
                 <input
-                  type="text"
+                  type="number"
+                  step="any"
+                  min="0"
                   value={size}
-                  onChange={(e) => {
-                    const val = e.target.value.replace(',', '.');
-                    setSize(val);
-                  }}
+                  onChange={(e) => setSize(e.target.value)}
                   placeholder="Taille en mètres"
                   className="pokedex-popup-input-size"
                 />
@@ -222,9 +243,10 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
           <div className="pokedex-popup-button-wrapper">
             <button
               onClick={handleSubmit}
+              disabled={isSubmitting}
               className="pokedex-popup-submit-button"
             >
-              Valider
+              {isSubmitting ? 'Envoi en cours...' : 'Valider'}
             </button>
           </div>
         )}
