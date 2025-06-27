@@ -1,5 +1,3 @@
-import './pc.css';
-
 export default function Navbar({ currentPage, totalPages, setCurrentPage }) {
   return (
     <div className="box-nav">

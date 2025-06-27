@@ -99,18 +99,7 @@ export default function PcContainer() {
 
   return (
     <>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginBottom: '10px',
-          position: 'relative',
-          maxWidth: 800,
-          marginLeft: 'auto',
-          marginRight: 'auto',
-        }}
-      >
+      <div className="pc-container-header">
         <Navbar
           currentPage={currentPage}
           totalPages={totalPages}
@@ -118,12 +107,7 @@ export default function PcContainer() {
         />
 
         {windowWidth > 600 && (
-          <div style={{
-            position: windowWidth > 800 ? 'absolute' : 'relative',
-            right: windowWidth > 800 ? 0 : 'auto',
-            marginTop: windowWidth > 800 ? 0 : 10,
-            zIndex: 10,
-          }}>
+          <div className={windowWidth > 800 ? 'mode-button-absolute' : 'mode-button-relative'}>
             <ModeButton
               mode={mode}
               setMode={(m) => {
@@ -136,36 +120,18 @@ export default function PcContainer() {
           </div>
         )}
 
-
         {windowWidth <= 600 && (
-          <div style={{ position: 'relative', right: 'auto', marginTop: 10 }}>
+          <>
             <button
+              className="menu-burger-btn"
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Menu"
-              style={{
-                fontSize: '1.5rem',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '0 10px',
-              }}
             >
               &#9776;
             </button>
 
             {menuOpen && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '40px',
-                  right: 0,
-                  background: 'white',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-                  borderRadius: '8px',
-                  zIndex: 10,
-                  padding: '10px',
-                }}
-              >
+              <div className="menu-burger-dropdown">
                 <ModeButton
                   mode={mode}
                   setMode={(m) => {
@@ -178,7 +144,7 @@ export default function PcContainer() {
                 />
               </div>
             )}
-          </div>
+          </>
         )}
       </div>
 
@@ -193,16 +159,9 @@ export default function PcContainer() {
         />
       )}
 
-
       <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
-          gap: gap,
-          justifyContent: 'center',
-          maxWidth: '90vw',
-          margin: '0 auto',
-        }}
+        className="pokemon-grid"
+        style={{ gridTemplateColumns: `repeat(${cols}, 120px)` }}
       >
         {displayedPokemons.map(pokemon => (
           <Pokemons
