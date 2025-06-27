@@ -27,7 +27,6 @@ export default function AddPokemon({ onAdd, onClose }) {
   const handleSubmit = (e) => {
   e.preventDefault();
 
-  // Vérification des champs obligatoires (name, size, sex, type1, photo, description)
   if (
     !name.trim() ||
     !size.trim() ||
@@ -76,53 +75,28 @@ export default function AddPokemon({ onAdd, onClose }) {
 };
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1000,
-      }}
-      onClick={onClose}
-    >
-      <div
-        style={{
-          background: 'white',
-          padding: '20px',
-          borderRadius: '10px',
-          width: '350px',
-          boxShadow: '0 0 10px rgba(0,0,0,0.25)',
-          position: 'relative',
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+    <div className="addpokemon-overlay" onClick={onClose}>
+      <div className="addpokemon-container" onClick={(e) => e.stopPropagation()}>
+        <form onSubmit={handleSubmit} className="addpokemon-form">
           <input
             type="text"
             placeholder="Nom du Pokémon"
             maxLength={18}
             value={name}
             onChange={(e) => setName(e.target.value)}
-            style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc' }}
+            className="addpokemon-input"
           />
           <input
             type="text"
             placeholder="Taille"
             value={size}
             onChange={(e) => setSize(e.target.value)}
-            style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc' }}
+            className="addpokemon-input"
           />
-           <select
+          <select
             value={sex}
             onChange={e => setSex(e.target.value)}
-            style={{ padding: 6, borderRadius: 6, border: '1px solid #ccc' }}
+            className="addpokemon-select"
           >
             <option value="">Sexe</option>
             {sexesList.map(s => (
@@ -132,18 +106,17 @@ export default function AddPokemon({ onAdd, onClose }) {
           <select
             value={type1}
             onChange={e => setType1(e.target.value)}
-            style={{ padding: 6, borderRadius: 6, border: '1px solid #ccc' }}
+            className="addpokemon-select"
           >
             <option value="">Type 1</option>
             {typesList.map(t => (
               <option key={t.id} value={t.id}>{t.libelle}</option>
             ))}
           </select>
-
           <select
             value={type2}
             onChange={e => setType2(e.target.value)}
-            style={{ padding: 6, borderRadius: 6, border: '1px solid #ccc' }}
+            className="addpokemon-select"
           >
             <option value="">Type 2</option>
             {typesList.map(t => (
@@ -155,27 +128,16 @@ export default function AddPokemon({ onAdd, onClose }) {
             placeholder="URL de l'image"
             value={photo}
             onChange={(e) => setPhoto(e.target.value)}
-            style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc' }}
+            className="addpokemon-input"
           />
           <textarea
             placeholder="Description"
             value={description}
             maxLength={200}
             onChange={(e) => setDescription(e.target.value)}
-            style={{ padding: '6px', borderRadius: '6px', border: '1px solid #ccc', height: '80px', resize: 'none' }}
+            className="addpokemon-textarea"
           />
-          <button
-            type="submit"
-            style={{
-              padding: '8px',
-              background: '#c8e6c9',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              cursor: 'pointer',
-            }}
-          >
-            Ajouter
-          </button>
+          <button type="submit" className="addpokemon-button">Ajouter</button>
         </form>
       </div>
     </div>

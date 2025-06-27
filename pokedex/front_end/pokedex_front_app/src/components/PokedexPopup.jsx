@@ -100,53 +100,11 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
   };
 
   return (
-    <div
-      onClick={onClose}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 10000,
-        padding: 20,
-      }}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          backgroundColor: 'white',
-          borderRadius: 16,
-          boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-          display: 'flex',
-          maxWidth: 600,
-          width: '100%',
-          padding: 20,
-          fontFamily: "'Helvetica Neue', Arial, sans-serif",
-          color: '#333',
-          position: 'relative',
-          flexDirection: 'column',
-          gap: 20,
-        }}
-      >
-        <div style={{ display: 'flex', gap: 20 }}>
-          {/* Colonne gauche */}
-          <div
-            style={{
-              flex: '0 0 200px',
-              textAlign: 'center',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 15,
-            }}
-          >
-            <img
-              src={photo}
-              alt={name}
-              style={{ width: 180, height: 180, objectFit: 'contain', borderRadius: 8 }}
-            />
+    <div className="pokedex-popup-overlay" onClick={onClose}>
+      <div className="pokedex-popup-container" onClick={e => e.stopPropagation()}>
+        <div className="pokedex-popup-main">
+          <div className="pokedex-popup-left">
+            <img src={photo} alt={name} />
             {editMode ? (
               <>
                 <input
@@ -154,37 +112,20 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
                   value={photo}
                   onChange={(e) => setPhoto(e.target.value)}
                   placeholder="URL de la photo"
-                  style={{
-                    width: '100%',
-                    padding: 6,
-                    borderRadius: 6,
-                    border: '1px solid #ccc',
-                    marginTop: 10,
-                    fontSize: 14,
-                    textAlign: 'center',
-                  }}
+                  className="pokedex-popup-input-photo"
                 />
                 <input
                   type="text"
                   value={name}
                   maxLength={18}
                   onChange={(e) => setName(e.target.value)}
-                  style={{
-                    width: '100%',
-                    fontSize: 24,
-                    fontWeight: 'bold',
-                    textAlign: 'center',
-                    padding: 6,
-                    borderRadius: 6,
-                    border: '1px solid #ccc',
-                    marginTop: 10,
-                  }}
+                  className="pokedex-popup-input-name"
                 />
-                <div style={{ display: 'flex', justifyContent: 'center', gap: 10 }}>
+                <div className="pokedex-popup-type-selects">
                   <select
                     value={type1}
                     onChange={(e) => setType1(e.target.value)}
-                    style={{ fontSize: 16, fontWeight: 'bold' }}
+                    className="pokedex-popup-type-select"
                   >
                     <option value="">Type 1</option>
                     {types.map(t => (
@@ -194,7 +135,7 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
                   <select
                     value={type2}
                     onChange={(e) => setType2(e.target.value)}
-                    style={{ fontSize: 16, fontWeight: 'bold' }}
+                    className="pokedex-popup-type-select"
                   >
                     <option value="">Type 2</option>
                     {types.map(t => (
@@ -205,18 +146,7 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
               </>
             ) : (
               <>
-                <h2
-                  style={{
-                    margin: 0,
-                    fontSize: 24,
-                    fontWeight: 'bold',
-                    width: '100%',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                  title={name}
-                >
+                <h2 title={name} style={{ margin: 0, fontSize: 24, fontWeight: 'bold', width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {name}
                 </h2>
                 <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
@@ -227,20 +157,9 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
             )}
           </div>
 
-          {/* Colonne droite */}
-          <div
-            style={{
-              flex: '1 1 350px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 20,
-              boxSizing: 'border-box',
-              maxWidth: 350,
-              minWidth: 350,
-            }}
-          >
-            <div style={{ flex: '0 0 150px', paddingRight: 8 }}>
-              <h3 style={{ marginTop: 0 }}>Description</h3>
+          <div className="pokedex-popup-right">
+            <div className="pokedex-popup-description">
+              <h3>Description</h3>
               {editMode ? (
                 <>
                   <textarea
@@ -248,29 +167,21 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
                     maxLength={200}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={3}
-                    style={{ width: '100%', height: '65%', resize: 'none', padding: 8, fontSize: 16, boxSizing: 'border-box' }}
+                    className="pokedex-popup-textarea"
                   />
-                  <div style={{ textAlign: 'right', fontSize: 12, color: '#666' }}>
+                  <div className="pokedex-popup-description-counter">
                     {description.length} / 200
                   </div>
                 </>
               ) : (
-                <p
-                  style={{
-                    margin: 0,
-                    whiteSpace: 'normal',
-                    wordWrap: 'break-word',
-                    overflowWrap: 'break-word',
-                  }}
-                  title={description}
-                >
+                <p title={description} style={{ margin: 0, whiteSpace: 'normal', wordWrap: 'break-word', overflowWrap: 'break-word' }}>
                   {description || 'Pas de description disponible.'}
                 </p>
               )}
             </div>
 
-            <div style={{ flex: '0 0 40px' }}>
-              <h4 style={{ margin: '0 0 4px 0' }}>Taille</h4>
+            <div className="pokedex-popup-size">
+              <h4>Taille</h4>
               {editMode ? (
                 <input
                   type="text"
@@ -280,20 +191,20 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
                     setSize(val);
                   }}
                   placeholder="Taille en mètres"
-                  style={{ fontSize: 16, padding: 4, width: '100%', boxSizing: 'border-box' }}
+                  className="pokedex-popup-input-size"
                 />
               ) : (
                 <p style={{ margin: 0 }}>{pokemon.taille ? `${pokemon.taille} m` : 'Inconnue'}</p>
               )}
             </div>
 
-            <div style={{ flex: '0 0 40px' }}>
-              <h4 style={{ margin: '0 0 4px 0' }}>Sexe</h4>
+            <div className="pokedex-popup-sex">
+              <h4>Sexe</h4>
               {editMode ? (
                 <select
                   value={gender}
                   onChange={e => setGender(parseInt(e.target.value))}
-                  style={{ fontSize: 16, padding: 4, width: '100%', boxSizing: 'border-box' }}
+                  className="pokedex-popup-select-sex"
                 >
                   <option value="">Sélectionner</option>
                   {sexes.map(s => (
@@ -308,18 +219,10 @@ export default function PokedexPopup({ pokemon, onClose, editMode = false, onUpd
         </div>
 
         {editMode && (
-          <div style={{ textAlign: 'right' }}>
+          <div className="pokedex-popup-button-wrapper">
             <button
               onClick={handleSubmit}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: '#4caf50',
-                border: 'none',
-                borderRadius: '6px',
-                color: 'white',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-              }}
+              className="pokedex-popup-submit-button"
             >
               Valider
             </button>

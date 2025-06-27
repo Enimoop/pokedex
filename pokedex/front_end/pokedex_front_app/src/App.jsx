@@ -1,7 +1,8 @@
 import React from 'react';
-import PcContainer from './components/PcContainer';  // <-- c’est le parent
+import PcContainer from './components/PcContainer'; 
 
 import './App.css';
+import './Pc.css';
 
 function App() {
   return (
