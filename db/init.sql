@@ -34,7 +34,8 @@ INSERT INTO Type (Libelle) VALUES
 ('Glace'),
 ('Poison'),
 ('Roche'),
-('Eau');
+('Eau'),
+('Combat');
 
 -- Table Pokémon
 CREATE TABLE Pokemon (
